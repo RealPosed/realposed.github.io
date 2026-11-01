@@ -1,37 +1,658 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>RealPosed</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 900px;
-      margin: 50px auto;
-      padding: 20px;
-      line-height: 1.6;
-    }
-    h1, h2 { color: #2774AE; }
-    nav a { margin-right: 20px; }
-  </style>
+  <title>RealPosed — Trustworthy world models for the physical world</title>
+  <meta name="description" content="RealPosed is building models of physical systems that learn from data while keeping to the governing equations, and that say how far each prediction can be trusted.">
+  <meta name="theme-color" content="#040d14">
+  <meta property="og:title" content="RealPosed — Trustworthy world models for the physical world">
+  <meta property="og:description" content="Mathematical world models for engineering, from UCLA.">
+  <link rel="icon" href="favicon.ico" sizes="32x32">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>An AI Company</h1>
-  <nav>
-    <a href="#research">Research</a>
-    <a href="#people">People</a>
-    <a href="#publications">Publications</a>
-  </nav>
+  <div class="blueprint" aria-hidden="true"></div>
+  <canvas class="amr" id="amr" aria-hidden="true"></canvas>
+  <a class="skip" href="#main">Skip to content</a>
 
-  <h2 id="research">Research</h2>
-  <p>We conduct research in artificial intelligence.</p>
+  <header class="nav" id="nav">
+    <div class="nav-inner">
+      <a class="nav-brand" href="#top" aria-label="RealPosed, home">
+        <img class="nav-logo" src="assets/logo-white.svg" alt="RealPosed" width="604" height="110">
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="#approach" data-nav>Approach</a>
+        <a href="#engine" data-nav>Model</a>
+        <a href="#lab" data-nav>Lab</a>
+        <a href="#research" data-nav>Research</a>
+        <a href="#industries" data-nav>Industries</a>
+        <a href="#team" data-nav>Team</a>
+        <a href="#contact" data-nav class="nav-links-mobile-only">Contact</a>
+      </nav>
+      <div class="nav-actions">
+        <a class="btn btn-primary btn-sm" href="#contact">Partner with us</a>
+        <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle menu">
+          <span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
 
-  <h2 id="people">People</h2>
-  <p>Meet our research team.</p>
+  <main id="main">
 
-  <h2 id="publications">Demo</h2>
-  <p>Our recent research demo.</p>
+    <!-- Hero: a line field that is turbulent on the left and ordered on the right -->
+    <section class="hero" id="top">
+      <canvas class="hero-canvas" id="wave" aria-hidden="true"></canvas>
+      <div class="hero-veil" aria-hidden="true"></div>
+
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <h1 class="hero-title" data-write>Trustworthy world models for the physical world.</h1>
+          <p class="hero-sub">
+            A generative model can draw a flow field that looks right and still fails to conserve
+            mass. We are building models of physical systems that learn from data while keeping to
+            the governing equations, and that say how far each prediction can be trusted.
+          </p>
+          <div class="hero-cta">
+            <a class="btn btn-primary" href="#pipeline">See how it works</a>
+            <a class="btn btn-ghost" href="#research">Read the publications</a>
+          </div>
+        </div>
+
+        <div class="hero-mark" aria-hidden="true">
+          <div class="mark-glow"></div>
+          <div class="mark">
+            <svg viewBox="0 0 256 256">
+              <defs>
+                <clipPath id="mark-left"><rect x="0" y="0" width="124.4" height="256"/></clipPath>
+                <mask id="mark-mask">
+                  <circle cx="128" cy="128" r="94" fill="#fff"/>
+                  <rect x="124.4" y="0" width="7.2" height="256" fill="#000"/>
+                  <g stroke="#000" stroke-width="9.8">
+                    <line x1="131.6" x2="256" y1="77.1" y2="77.1"/>
+                    <line x1="131.6" x2="256" y1="111" y2="111"/>
+                    <line x1="131.6" x2="256" y1="145" y2="145"/>
+                    <line x1="131.6" x2="256" y1="178.9" y2="178.9"/>
+                  </g>
+                  <g clip-path="url(#mark-left)">
+                    <g class="waves" id="mark-waves" stroke="#000" stroke-width="9.8" fill="none"></g>
+                  </g>
+                </mask>
+              </defs>
+              <circle cx="128" cy="128" r="94" fill="#fff" mask="url(#mark-mask)"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-hud" aria-hidden="true">
+        <span>∂²u/∂t² = c²∇²u</span>
+        <span>grid <b id="hud-grid">—</b></span>
+        <span><b id="hud-fps">—</b> fps</span>
+        <span><b id="hud-t">0.0</b> s</span>
+      </div>
+      <p class="hero-hint" aria-hidden="true">Click anywhere to send a wave through the field.</p>
+    </section>
+
+    <!-- Approach -->
+    <section class="section" id="approach">
+      <div class="container">
+        <header class="section-head">
+          <h2 data-write>Predictions you can check.</h2>
+          <p class="lede">
+            Some models end up deciding whether a part gets certified or a well gets drilled. A
+            model in that position has to agree with the physics and with the measurements, and it
+            has to say where it is unsure.
+          </p>
+        </header>
+        <div class="pillars">
+          <div class="pillar">
+            <h3>Infer the dynamics</h3>
+            <p>Most systems are only partly observed: a few sensors, a coarse simulation, a satellite pass every few hours. We reconstruct the full state from those pieces and learn the operators that move it forward, including terms the textbook equations leave out.</p>
+          </div>
+          <div class="pillar">
+            <h3>Check the mathematics</h3>
+            <p>Fitting the training data is no evidence that a model conserves energy or stays stable over a long rollout. We test each model against the structure of its equations, and prove the important properties where that is feasible.</p>
+          </div>
+          <div class="pillar">
+            <h3>Predict beyond the data</h3>
+            <p>The next design will have a new geometry, a different boundary condition or an operating point nobody simulated. A model that keeps the physics explicit has a chance of saying something useful there.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pipeline -->
+    <section class="section section-alt" id="pipeline">
+      <div class="container pipeline-grid">
+        <div class="pipeline-intro">
+          <h2 data-write>From measurements to design decisions.</h2>
+          <p class="lede">
+            The governing equations stay part of the model from the first measurement to the final
+            design. Conservation laws constrain what it learns, and generative methods give each
+            forecast a spread, so you can see how confident it is.
+          </p>
+          <div class="instrument stage-wrap">
+            <canvas id="stage" aria-hidden="true"></canvas>
+            <span class="instrument-label" id="stage-label">1. Observe and encode</span>
+          </div>
+          <p class="hint">Hover over a step to see what it does to a single signal.</p>
+        </div>
+
+        <ol class="steps" id="steps">
+          <li class="step">
+            <span class="step-num">1</span>
+            <div class="step-body">
+              <h3>Observe and encode</h3>
+              <p>Sensors, experiments, simulations and remote sensing each see part of a system, at different resolutions and with different noise. We encode them into one shared representation of the fields, the geometry and the boundary conditions.</p>
+            </div>
+          </li>
+          <li class="step">
+            <span class="step-num">2</span>
+            <div class="step-body">
+              <h3>Infer the hidden state</h3>
+              <p>From those partial views, reconstruct the full physical state. This is an inverse problem, usually an ill-posed one, so the regularization has to be chosen with care.</p>
+            </div>
+          </li>
+          <li class="step">
+            <span class="step-num">3</span>
+            <div class="step-body">
+              <h3>Discover the dynamics</h3>
+              <p>Learn the operator that advances the state in time. Known physics is written in directly, and the network fits only the residual, such as unresolved turbulence or an unknown constitutive law.</p>
+            </div>
+          </li>
+          <li class="step">
+            <span class="step-num">4</span>
+            <div class="step-body">
+              <h3>Verify</h3>
+              <p>Check that the learned model conserves what it should, stays stable over long rollouts and is calibrated on held-out data. Where it is practical, prove the key properties as well.</p>
+            </div>
+          </li>
+          <li class="step">
+            <span class="step-num">5</span>
+            <div class="step-body">
+              <h3>Simulate</h3>
+              <p>Run the model forward. Flow matching evolves the state efficiently, and diffusion samples several physically plausible futures; the spread between them is the uncertainty.</p>
+            </div>
+          </li>
+          <li class="step">
+            <span class="step-num">6</span>
+            <div class="step-body">
+              <h3>Design and control</h3>
+              <p>Ask what happens with a different geometry or operating point, search for a better design, or close a control loop around the system.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Engine -->
+    <section class="section" id="engine">
+      <div class="container">
+        <header class="section-head">
+          <h2 data-write>The model, in four parts.</h2>
+          <p class="lede">
+            The goal is a single generative model of physical dynamics, built from four parts. Each
+            panel below is a small live example of the idea behind one of them.
+          </p>
+        </header>
+
+        <div class="bento">
+          <article class="card card-lg">
+            <div class="card-visual">
+              <canvas id="heat" aria-label="Paintable two-dimensional heat equation"></canvas>
+              <span class="corner-hint">Draw to add heat</span>
+              <span class="corner-eq">∂u/∂t = α∇²u</span>
+            </div>
+            <div class="card-body">
+              <h3>Dynamics discovery</h3>
+              <p>Simulations are plentiful but idealized; measurements are real but sparse. The model learns governing operators from both, and keeps the known physics separate from what still has to be learned.</p>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-visual">
+              <canvas id="flow" aria-label="Particles advected along a Taylor–Green vortex field"></canvas>
+              <span class="corner-hint">Move to stir</span>
+              <span class="corner-eq">dxₜ = vθ(xₜ, t) dt</span>
+            </div>
+            <div class="card-body">
+              <h3>PDE-grounded generative dynamics</h3>
+              <p>The dynamics are generative and constrained by the governing PDE. From a single starting state, the model can sample a whole family of physically plausible futures.</p>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-visual">
+              <canvas id="fourier" aria-label="Fourier epicycles drawing shapes from several physical systems with one shared basis; the cursor sets how many modes are kept"></canvas>
+              <span class="corner-hint">Move left or right to change the number of modes</span>
+              <span class="corner-eq">z(t) = Σ cₙ e^{int}</span>
+            </div>
+            <div class="card-body">
+              <h3>Cross-system foundation model</h3>
+              <p>One set of Fourier circles can draw an airfoil, a droplet or a crystal. We want the same economy for physics: a learned representation of fields, operators, geometry and boundary conditions that carries over from one family of PDEs to the next.</p>
+            </div>
+          </article>
+
+          <article class="card card-wide">
+            <div class="card-visual">
+              <canvas id="optim" aria-label="Gradient descent on a design landscape"></canvas>
+              <span class="corner-hint">Click to start a descent from there</span>
+              <span class="corner-eq">θₖ₊₁ = θₖ − η∇J(θₖ)</span>
+            </div>
+            <div class="card-body">
+              <h3>Engineering agent</h3>
+              <p>Puts the model to work on what-if questions, inverse design and optimization. Later this becomes an agent that runs the full propose, simulate, evaluate and redesign loop itself, and that other AI systems can call as a tool.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Resolve finer -->
+    <section class="section section-alt" id="resolve">
+      <div class="container resolve-grid">
+        <div>
+          <h2 data-write>Fine detail from a coarse simulation.</h2>
+          <p class="lede">
+            Resolving every eddy in a flow is expensive, so most production simulations run on
+            coarse grids. We want a model that takes a cheap coarse run and fills in the fine
+            structure a full-resolution solve would have shown, without breaking the physics. Drag
+            the handle to compare the two.
+          </p>
+          <p class="hint">The panel is a stylized illustration of the goal, not output from one of our models.</p>
+        </div>
+
+        <div>
+          <div class="compare instrument" id="compare" role="img" aria-label="Drag to compare: a coarse input field versus its fine-resolution reconstruction">
+            <canvas id="sr-coarse"></canvas>
+            <canvas id="sr-fine" class="cmp-top"></canvas>
+            <span class="cmp-label cmp-label-l">Coarse input</span>
+            <span class="cmp-label cmp-label-r">Reconstruction</span>
+            <div class="cmp-handle"></div>
+          </div>
+          <div class="cmp-foot">
+            <span class="readout">Drag the handle</span>
+            <span class="readout">Split <b id="cmp-pos">50%</b></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Lab -->
+    <section class="section lab" id="lab">
+      <div class="container lab-grid">
+        <div class="lab-copy">
+          <h2 data-write>Most real inverse problems are ill-posed.</h2>
+          <p class="lede">
+            In 1902 Jacques Hadamard called a problem well-posed if a solution exists, is unique,
+            and changes continuously with the data. Inverse problems in practice tend to fail the
+            last test: a little measurement noise can swing the answer wildly.
+          </p>
+          <p class="lede">
+            The panel shows a signal that was blurred and then measured with noise. The naive
+            inverse undoes the blur exactly but amplifies the noise along with it. Each
+            regularizer avoids this by assuming something about the answer: Tikhonov that its
+            values are small, Wiener that it is smooth, total variation that it is flat except at
+            a few sharp jumps, and L1 that it is mostly zero.
+          </p>
+          <div class="controls instrument">
+            <label class="control">
+              <span class="control-head"><span>Noise σ</span><output id="noise-out" for="noise">0.024</output></span>
+              <input type="range" id="noise" min="0" max="100" value="20" step="1">
+            </label>
+            <label class="control">
+              <span class="control-head"><span>Regularization λ</span><output id="lambda-out" for="lambda">1e-2</output></span>
+              <input type="range" id="lambda" min="0" max="100" value="67" step="1">
+            </label>
+            <div class="control-row" role="group" aria-label="Reconstruction method">
+              <button class="chip" type="button" data-method="naive" aria-pressed="false">Naive inverse</button>
+              <button class="chip" type="button" data-method="tikhonov" aria-pressed="true">Tikhonov</button>
+              <button class="chip" type="button" data-method="wiener" aria-pressed="false">Wiener</button>
+              <button class="chip" type="button" data-method="tv" aria-pressed="false">Total variation</button>
+              <button class="chip" type="button" data-method="l1" aria-pressed="false">L1</button>
+            </div>
+            <div class="control-row">
+              <button class="chip" type="button" id="reroll">New noise</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel instrument">
+          <div class="panel-head">
+            <span class="panel-title" id="lab-formula">x̂ = (KᵀK + λI)⁻¹ Kᵀ y</span>
+            <span class="status" id="lab-status" data-state="stable">well-posed</span>
+          </div>
+          <div class="panel-body">
+            <canvas id="lab-canvas" role="img" aria-label="Interactive deconvolution: truth, noisy data, and reconstruction"></canvas>
+          </div>
+          <div class="panel-foot">
+            <span class="legend"><i class="sw sw-truth"></i>truth</span>
+            <span class="legend"><i class="sw sw-data"></i>data</span>
+            <span class="legend"><i class="sw sw-rec"></i>reconstruction</span>
+            <span class="readout">err <b id="lab-err">—</b></span>
+            <span class="readout">κ <b id="lab-cond">—</b></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Research -->
+    <section class="section section-alt" id="research">
+      <div class="container">
+        <header class="section-head">
+          <h2 data-write>The research behind it.</h2>
+          <p class="lede">
+            RealPosed grew out of two groups at UCLA. Andrea Bertozzi’s group has spent three
+            decades on nonlinear PDEs, fluid dynamics and their use in data science. Wei Wang’s
+            group works on machine learning for dynamical systems, from graph ODEs to diffusion
+            models for fluid simulation. The company is an attempt to put both into one pretrained
+            model.
+          </p>
+        </header>
+
+        <div class="lineage">
+          <div class="lineage-col">
+            <h3>Bertozzi group, 1993 to 2026</h3>
+            <ol>
+              <li><b>1993–02</b><span><strong>PDE foundations.</strong> Global regularity for vortex patches; vorticity and incompressible flow.</span></li>
+              <li><b>2004–10</b><span><strong>Complex systems.</strong> Swarming patterns; fourth-order PDEs on general geometries.</span></li>
+              <li><b>2012–17</b><span><strong>Physics and data.</strong> Diffuse interface models on graphs; hyperspectral inpainting.</span></li>
+              <li><b>2018–24</b><span><strong>Rigorous learning.</strong> PDEs in data science.</span></li>
+              <li><b>2025–26</b><span><strong>Generative methods.</strong> Plug-and-play image restoration with flow matching.</span></li>
+            </ol>
+          </div>
+          <div class="lineage-col">
+            <h3>Wang group, 2020 to 2026</h3>
+            <ol>
+              <li><b>2020</b><span><strong>Partial observations.</strong> Learning dynamics from incomplete views.</span></li>
+              <li><b>2021–23</b><span><strong>Generalizable dynamics.</strong> Coupled graph ODE, then generalizing across environments.</span></li>
+              <li><b>2024</b><span><strong>Physics and causality.</strong> Physics-informed regularization; causal graph ODE.</span></li>
+              <li><b>2025</b><span><strong>Reconstruction from sensors.</strong> Flow-field reconstruction; learning where to place sensors.</span></li>
+              <li><b>2026</b><span><strong>Generative simulation.</strong> Self-guided diffusion for CFD; neural Lagrangian simulation.</span></li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="pubs-head">
+          <h3>Selected publications</h3>
+          <div class="control-row" role="group" aria-label="Filter publications">
+            <button class="chip" type="button" data-filter="all" aria-pressed="true">All</button>
+            <button class="chip" type="button" data-filter="theory" aria-pressed="false">PDE theory</button>
+            <button class="chip" type="button" data-filter="generative" aria-pressed="false">Generative models</button>
+            <button class="chip" type="button" data-filter="neural" aria-pressed="false">Neural simulation</button>
+            <button class="chip" type="button" data-filter="systems" aria-pressed="false">Benchmarks and agents</button>
+          </div>
+        </div>
+        <div class="pubs">
+          <article class="pub" data-domain="generative">
+            <span class="pub-venue">ICLR 2026</span>
+            <div><h4><a href="https://openreview.net/forum?id=CeOIVXMl4r" target="_blank" rel="noopener">STORK: Faster Diffusion and Flow Matching Sampling by Resolving Both Stiffness and Structure-Dependence</a></h4><p>Zheng Tan, Weizhen Wang, Andrea L. Bertozzi, Ernest K. Ryu</p></div>
+          </article>
+          <article class="pub" data-domain="systems">
+            <span class="pub-venue">ICML 2026</span>
+            <div><h4><a href="https://proceedings.mlr.press/v306/wang26kv.html" target="_blank" rel="noopener">ARLArena: A Unified Framework for Stable Agentic Reinforcement Learning</a></h4><p>Xiaoxuan Wang, Han Zhang, Haixin Wang, Yidan Shi, Ruoyan Li, Kaiqiao Han, Chenyi Tong, Haoran Deng, Alexander K. Taylor, Renliang Sun, Yanqiao Zhu, Jason Cong, Yizhou Sun, Wei Wang</p></div>
+          </article>
+          <article class="pub" data-domain="neural">
+            <span class="pub-venue">KDD 2026</span>
+            <div><h4><a href="https://doi.org/10.1145/3770855.3818147" target="_blank" rel="noopener">CoRGI: GNNs with Convolutional Residual Global Interactions for Lagrangian Simulation</a></h4><p>Ethan Ji, Yuanzhou Chen, Arush Ramteke, Fang Sun, Tianrun Yu, Jai Parera, Peipei Ping, Wei Wang, Yizhou Sun</p></div>
+          </article>
+          <article class="pub" data-domain="generative">
+            <span class="pub-venue">KDD 2026</span>
+            <div><h4><a href="https://doi.org/10.1145/3770854.3780314" target="_blank" rel="noopener">Self-Guided Diffusion Model for Accelerating Computational Fluid Dynamics</a></h4><p>Ruoyan Li, Zijie Huang, Haixin Wang, Guancheng Wan, Yizhou Sun, Wei Wang</p></div>
+          </article>
+          <article class="pub" data-domain="systems">
+            <span class="pub-venue">KDD 2026</span>
+            <div><h4><a href="https://doi.org/10.1145/3770855.3817497" target="_blank" rel="noopener">FD-Bench: A Modular and Fair Benchmark for Data-driven Fluid Simulation</a></h4><p>Haixin Wang, Ruoyan Li, Fred Xu, Fang Sun, Kaiqiao Han, Zijie Huang, Chi Chang, Xiao Luo, Wei Wang, Yizhou Sun</p></div>
+          </article>
+          <article class="pub" data-domain="neural">
+            <span class="pub-venue">NeurIPS 2025</span>
+            <div><h4><a href="https://proceedings.neurips.cc/paper_files/paper/2025/hash/9708c7d3a0fef3710f33ba05a74e10b3-Abstract-Conference.html" target="_blank" rel="noopener">Flow Field Reconstruction with Sensor Placement Policy Learning</a></h4><p>Ruoyan Li, Guancheng Wan, Zijie Huang, Zixiao Liu, Haixin Wang, Xiao Luo, Wei Wang, Yizhou Sun</p></div>
+          </article>
+          <article class="pub" data-domain="theory">
+            <span class="pub-venue">Preprint, 2026</span>
+            <div><h4><a href="https://arxiv.org/abs/2609.28714" target="_blank" rel="noopener">Generic Structural Stability for Riemann Solutions to n×n Systems of Hyperbolic Conservation Laws</a></h4><p>Hong Kiat Tan, Andrea L. Bertozzi</p></div>
+          </article>
+          <article class="pub" data-domain="theory">
+            <span class="pub-venue">DCDS 2026</span>
+            <div><h4><a href="https://doi.org/10.3934/dcds.2026162" target="_blank" rel="noopener">Macroscopic Traffic Flow Network Modeling for Wildfire Evacuation: A Game-Theoretic Junction Optimization Approach</a></h4><p>Annie Lu, Hong Kiat Tan, Alexander Xue, Alice Koniges, Andrea L. Bertozzi</p></div>
+          </article>
+          <article class="pub" data-domain="theory">
+            <span class="pub-venue">Commun. Math. Phys. 1993</span>
+            <div><h4><a href="https://doi.org/10.1007/BF02097055" target="_blank" rel="noopener">Global Regularity for Vortex Patches</a></h4><p>Andrea L. Bertozzi, Peter Constantin</p></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Industries: six small live models -->
+    <section class="section" id="industries">
+      <div class="container">
+        <header class="section-head">
+          <h2 data-write>Where it applies.</h2>
+          <p class="lede">
+            The approach fits any field where simulations are too expensive to run as often as
+            needed, the equations are only partly known, or the measurements are sparse. Each card
+            runs a small model from that field and responds to your cursor.
+          </p>
+        </header>
+
+        <div class="toys">
+          <article class="toy card">
+            <div class="card-visual">
+              <canvas id="toy-aero" aria-label="Potential flow around a Joukowski airfoil; the cursor sets the angle of attack"></canvas>
+              <span class="corner-hint">Move up or down to pitch the airfoil</span>
+              <span class="corner-eq">Joukowski flow</span>
+            </div>
+            <div class="card-body">
+              <h3>Aerospace</h3>
+              <p>Turbulence and aeroelastic loads, and inverse design of shapes outside the range anyone has simulated or tested.</p>
+            </div>
+          </article>
+
+          <article class="toy card">
+            <div class="card-visual">
+              <canvas id="toy-energy" aria-label="Injection flow through heterogeneous rock toward a producer well; the cursor moves the injector"></canvas>
+              <span class="corner-hint">Move the injection well</span>
+              <span class="corner-eq">Darcy flow, k(x) varies</span>
+            </div>
+            <div class="card-body">
+              <h3>Energy</h3>
+              <p>Subsurface flow for geothermal energy and CO₂ storage, plasma behavior in fusion devices, and state estimation on the grid.</p>
+            </div>
+          </article>
+
+          <article class="toy card">
+            <div class="card-visual">
+              <canvas id="toy-semi" aria-label="A MOSFET in cross-section; cursor height sets the gate voltage and cursor position sets the drain voltage"></canvas>
+              <span class="corner-hint">Move up to open the gate, right to raise the drain voltage</span>
+              <span class="corner-eq">I<sub>D</sub> = k[(V<sub>G</sub> − V<sub>th</sub>)V<sub>D</sub> − ½V<sub>D</sub>²]</span>
+            </div>
+            <div class="card-body">
+              <h3>Semiconductors</h3>
+              <p>Device physics, heat and electromagnetic fields in chips and packages, where coupled multiphysics runs take too long to use during design.</p>
+            </div>
+          </article>
+
+          <article class="toy card">
+            <div class="card-visual">
+              <canvas id="toy-control" aria-label="A two-joint robot arm under PID control, moving boxes between two pads; the cursor sets where the gripper goes, and two charts plot each joint's target against its actual angle"></canvas>
+              <span class="corner-hint corner-hint-top">Point to move the arm</span>
+              <span class="corner-eq">u = K<sub>p</sub>e + K<sub>i</sub>∫e dt + K<sub>d</sub>ė</span>
+            </div>
+            <div class="card-body">
+              <h3>Manufacturing</h3>
+              <p>Thermal and mechanical change during a process, modeled well enough to close a control loop on the line.</p>
+            </div>
+          </article>
+
+          <article class="toy card">
+            <div class="card-visual">
+              <canvas id="toy-material" aria-label="A spring lattice; a push sends a wave through it, and it fractures when overstrained"></canvas>
+              <span class="corner-hint">Click to send a wave through the crystal; hold and drag to fracture it</span>
+              <span class="corner-eq">σ = C : ε</span>
+            </div>
+            <div class="card-body">
+              <h3>Materials</h3>
+              <p>Fracture and phase transitions across length scales, and constitutive laws learned from experimental data.</p>
+            </div>
+          </article>
+
+          <article class="toy card">
+            <div class="card-visual">
+              <canvas id="toy-earth" aria-label="Wildfire spread on a landscape; the cursor sets the wind"></canvas>
+              <span class="corner-hint">Your cursor is the wind</span>
+              <span class="corner-eq">Fire spread, wind-driven</span>
+            </div>
+            <div class="card-body">
+              <h3>Earth systems</h3>
+              <p>Atmosphere, oceans and wildfire, where satellites supply most of the observations and much of the physics is parameterized.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Team -->
+    <section class="section section-alt" id="team">
+      <div class="container">
+        <header class="section-head">
+          <h2 data-write>Founded by UCLA scientists.</h2>
+          <p class="lede">RealPosed was started by a mathematician and a computer scientist who have each spent a career on one half of this problem.</p>
+        </header>
+        <div class="people">
+          <div class="person">
+            <div class="person-head">
+              <div class="person-photo"><img src="assets/bertozzi.jpg" alt="Andrea Bertozzi" width="320" height="320"></div>
+              <div>
+                <h3><a href="https://www.math.ucla.edu/~bertozzi/" target="_blank" rel="noopener">Andrea Bertozzi</a></h3>
+                <p class="person-role">Co-founder and CEO</p>
+              </div>
+            </div>
+            <p class="person-bio">Distinguished Professor of Mathematics and of Mechanical and Aerospace Engineering at UCLA, and a member of the National Academy of Sciences. Across more than 330 papers, Bertozzi’s work ranges from the analysis of nonlinear PDEs and fluid dynamics to scientific computing and data-driven modeling. Simons Math+X Investigator; Fellow of AMS, SIAM, APS and the American Academy of Arts and Sciences.</p>
+          </div>
+          <div class="person">
+            <div class="person-head">
+              <div class="person-photo"><img src="assets/wang.jpg" alt="Wei Wang" width="320" height="320"></div>
+              <div>
+                <h3><a href="https://web.cs.ucla.edu/~weiwang/" target="_blank" rel="noopener">Wei Wang</a></h3>
+                <p class="person-role">Co-founder and President</p>
+              </div>
+            </div>
+            <p class="person-bio">Leonard Kleinrock Chair Professor and Chair of Computer Science at UCLA, and Director of the Scalable Analytics Institute. Wang has published more than 400 papers in machine learning, scalable AI and AI for science, and leads a $5M DARPA program at UCLA. Fellow of ACM and IEEE; 2026 ACM SIGKDD Innovation Award.</p>
+          </div>
+        </div>
+        <p class="hint">We are assembling the founding team, with roles in PDE analysis, numerical methods, machine learning systems and application areas such as energy and aerospace.</p>
+      </div>
+    </section>
+
+    <!-- The name -->
+    <section class="manifesto" id="manifesto">
+      <div class="manifesto-sticky">
+        <div class="container manifesto-grid">
+          <div>
+            <p class="manifesto-text">
+              <span>Not</span> <span>well-posed.</span> <span>Not</span> <span>ill-posed.</span>
+              <span class="hi">Real</span> <span class="hi">Posed.</span>
+            </p>
+            <p class="manifesto-sub">Real as in real analysis, posed as in Hadamard. The problems engineers actually face rarely fit either textbook case.</p>
+          </div>
+          <div class="hadamard instrument">
+            <p class="instrument-title">Hadamard’s three conditions</p>
+            <div class="switches">
+              <button class="switch" type="button" aria-pressed="true" data-cond><span class="knob"></span><span class="switch-label">A solution exists</span></button>
+              <button class="switch" type="button" aria-pressed="true" data-cond><span class="knob"></span><span class="switch-label">It is unique</span></button>
+              <button class="switch" type="button" aria-pressed="true" data-cond><span class="knob"></span><span class="switch-label">It depends continuously on the data</span></button>
+            </div>
+            <div class="hadamard-badge" id="hadamard-badge" data-ok="true"><span></span><b>well-posed</b></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Roadmap -->
+    <section class="section" id="roadmap">
+      <div class="container">
+        <header class="section-head">
+          <h2 data-write>The next 15 to 18 months.</h2>
+        </header>
+        <ol class="milestones">
+          <li class="milestone">
+            <h3>A working prototype</h3>
+            <p>A PDE-grounded world model that learns dynamics from data and still holds up when moved to a different physical regime.</p>
+          </li>
+          <li class="milestone">
+            <h3>Verification you can inspect</h3>
+            <p>Every model comes with the checks that justify it, and its most important properties are proved formally where that is feasible.</p>
+          </li>
+          <li class="milestone">
+            <h3>10 to 100× faster on selected workloads</h3>
+            <p>At accuracy an engineer would accept, including on geometries and boundary conditions the model has not seen.</p>
+          </li>
+          <li class="milestone">
+            <h3>Outside validation</h3>
+            <p>Benchmarks developed with national laboratories and industrial partners, so results are measured on their problems and not only on ours.</p>
+          </li>
+        </ol>
+        <p class="hint">These are goals, not results we can show yet.</p>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="section cta" id="contact">
+      <div class="cta-glow" aria-hidden="true"></div>
+      <div class="container cta-inner">
+        <h2 data-write>Tell us what you can’t simulate.</h2>
+        <p class="lede">We are looking for a few engineering teams and national laboratories to work with on early benchmarks. If your current simulations are too slow or too crude for the decisions you have to make, we would like to hear about it.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="#contact" data-contact="ia.desoplaer@ofni">Get in touch</a>
+          <a class="btn btn-ghost" href="#research">Read the publications</a>
+        </div>
+        <p class="cta-note"><a href="#contact" data-contact="ia.desoplaer@ofni" data-contact-text></a><span>Los Angeles</span></p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img class="footer-logo" src="assets/logo-white.svg" alt="RealPosed" width="604" height="110">
+        <p class="footer-tagline">Mathematical world models for engineering.</p>
+      </div>
+      <nav class="footer-cols" aria-label="Footer">
+        <div class="footer-col">
+          <span class="footer-col-label">Company</span>
+          <a href="#approach">Approach</a>
+          <a href="#engine">Model</a>
+          <a href="#team">Team</a>
+          <a href="#roadmap">Roadmap</a>
+        </div>
+        <div class="footer-col">
+          <span class="footer-col-label">Research</span>
+          <a href="#research">Publications</a>
+          <a href="#resolve">Coarse to fine</a>
+          <a href="#lab">Well-posedness lab</a>
+        </div>
+        <div class="footer-col">
+          <span class="footer-col-label">Work with us</span>
+          <a href="#industries">Industries</a>
+          <a href="#contact">Contact</a>
+        </div>
+      </nav>
+    </div>
+    <div class="container footer-base">
+      <span>© 2026 RealPosed, Los Angeles</span>
+      <span>Every animation on this page is computed live in your browser.</span>
+    </div>
+  </footer>
+
+  <script src="script.js" defer></script>
 </body>
 </html>
